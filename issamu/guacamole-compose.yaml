@@ -1,0 +1,51 @@
+services:
+  guacd:
+    image: guacamole/guacd
+    container_name: guacd
+    environment:
+      LOG_LEVEL: debug # default is 'info'
+    networks:
+      - guacnet
+    restart: unless-stopped
+
+  guacamole:
+    image: guacamole/guacamole
+    container_name: guacamole
+    environment:
+      # REMOTE_IP_VALVE_ENABLED: true
+      GUACD_HOSTNAME: guacd
+      POSTGRESQL_ENABLED: true
+      POSTGRESQL_HOSTNAME: 'guac-pg'
+      POSTGRESQL_DATABASE: ${POSTGRESQL_DATABASE}
+      POSTGRESQL_USERNAME: ${POSTGRESQL_USERNAME}
+      POSTGRESQL_PASSWORD: ${POSTGRESQL_PASSWORD}
+    volumes:
+      - initdb:/opt/guacamole/extensions/guacamole-auth-jdbc/postgresql/schema:ro
+    ports:
+      - 8080:8080
+    networks:
+      - guacnet
+    restart: unless-stopped
+
+  guac-pg:
+    image: postgres
+    container_name: guac-pg
+    shm_size: 128mb  # set shared memory limit when using docker compose
+    environment:
+      POSTGRES_USER: ${POSTGRESQL_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+      POSTGRES_DB: ${POSTGRESQL_DATABASE}
+    volumes:
+      - initdb:/docker-entrypoint-initdb.d:ro
+      - ${GUACAMOLE_VOLUME}/postgresql:/var/lib/postgresql # >=18 postgres
+    networks:
+      - guacnet
+    restart: unless-stopped
+    
+volumes:
+  initdb: # this will serve as an intermidiary volume between guacamole and guac-pg
+  
+networks:
+  guacnet:
+    name: guacnet
+    driver: bridge

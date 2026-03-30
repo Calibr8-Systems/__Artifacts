@@ -1,5 +1,5 @@
 #!/bin/bash
-echo "[$(date)] Starting Helios installation"
+echo "[$(date)] Starting Guacamole installation"
 
 read -p "Get Portainer? (y/n): " portainer_install
 if [ "$portainer_install" = "y" ]; then
@@ -11,16 +11,16 @@ else
         echo "Wrong input!"
 fi
 
-mkdir /helios
-cd /helios || exit 1
+mkdir /guacamole
+cd /guacamole || exit 1
 
 # get compose file
-curl --no-progress-meter https://raw.githubusercontent.com/Calibr8-Systems/__Artifacts/refs/heads/master/issamu/helios-compose.yaml >> docker-compose.yml
+curl --no-progress-meter https://raw.githubusercontent.com/Calibr8-Systems/__Artifacts/refs/heads/master/issamu/guacamole-compose.yaml >> docker-compose.yaml
 
 # get .env file
-curl --no-progress-meter https://raw.githubusercontent.com/Calibr8-Systems/__Artifacts/refs/heads/master/issamu/default-helios.env >> .env
+curl --no-progress-meter https://raw.githubusercontent.com/Calibr8-Systems/__Artifacts/refs/heads/master/issamu/default-guacamole.env >> .env
 
 # docker must be intalled on the systems you are trying to use this script on!
 docker compose up -d
 
-echo "[$(date)] Helios installation completed"
+echo "[$(date)] Guacamole installation completed"

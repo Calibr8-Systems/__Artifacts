@@ -1,0 +1,214 @@
+[
+    {
+        "id": "6553404a43c0a5de",
+        "type": "tab",
+        "label": "Set-Get Context",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0ed42799ea21a9cd",
+        "type": "group",
+        "z": "6553404a43c0a5de",
+        "name": "Set Context",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "ce973af93935999e",
+            "afc68308a520133b",
+            "be459bb735499e52"
+        ],
+        "x": 14,
+        "y": 299,
+        "w": 492,
+        "h": 122
+    },
+    {
+        "id": "2502e616c3900e5c",
+        "type": "group",
+        "z": "6553404a43c0a5de",
+        "name": "Get Context",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "bf1ba45909b6546e",
+            "7dbb32e205cd7ac2",
+            "e3becb26d7adcf47",
+            "de2e2b84122f2946"
+        ],
+        "x": 14,
+        "y": 119,
+        "w": 692,
+        "h": 122
+    },
+    {
+        "id": "bf1ba45909b6546e",
+        "type": "get-context",
+        "z": "6553404a43c0a5de",
+        "g": "2502e616c3900e5c",
+        "name": "",
+        "contextType": "global",
+        "x": 390,
+        "y": 200,
+        "wires": [
+            [
+                "e3becb26d7adcf47"
+            ]
+        ]
+    },
+    {
+        "id": "7dbb32e205cd7ac2",
+        "type": "inject",
+        "z": "6553404a43c0a5de",
+        "g": "2502e616c3900e5c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "omf_types",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "bf1ba45909b6546e"
+            ]
+        ]
+    },
+    {
+        "id": "e3becb26d7adcf47",
+        "type": "debug",
+        "z": "6553404a43c0a5de",
+        "g": "2502e616c3900e5c",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "ce973af93935999e",
+        "type": "set-context",
+        "z": "6553404a43c0a5de",
+        "d": true,
+        "g": "0ed42799ea21a9cd",
+        "name": "",
+        "contextType": "global",
+        "x": 410,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "afc68308a520133b",
+        "type": "inject",
+        "z": "6553404a43c0a5de",
+        "d": true,
+        "g": "0ed42799ea21a9cd",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "omf_containers",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 380,
+        "wires": [
+            [
+                "ce973af93935999e"
+            ]
+        ]
+    },
+    {
+        "id": "de2e2b84122f2946",
+        "type": "inject",
+        "z": "6553404a43c0a5de",
+        "g": "2502e616c3900e5c",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "omf_containers",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "bf1ba45909b6546e"
+            ]
+        ]
+    },
+    {
+        "id": "be459bb735499e52",
+        "type": "inject",
+        "z": "6553404a43c0a5de",
+        "d": true,
+        "g": "0ed42799ea21a9cd",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "omf_types",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 130,
+        "y": 340,
+        "wires": [
+            [
+                "ce973af93935999e"
+            ]
+        ]
+    }
+]

@@ -1,0 +1,57 @@
+[
+    {
+        "id": "46908779242136d1",
+        "type": "tab",
+        "label": "Healthcheck",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b3a62a8c7ffcb9d8",
+        "type": "http in",
+        "z": "46908779242136d1",
+        "name": "",
+        "url": "/healthcheck",
+        "method": "get",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 340,
+        "y": 320,
+        "wires": [
+            [
+                "f2e50a3489e9a799"
+            ]
+        ]
+    },
+    {
+        "id": "2bce32a09c0b358c",
+        "type": "http response",
+        "z": "46908779242136d1",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 790,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "f2e50a3489e9a799",
+        "type": "template",
+        "z": "46908779242136d1",
+        "name": "",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "healthy",
+        "output": "str",
+        "x": 580,
+        "y": 320,
+        "wires": [
+            [
+                "2bce32a09c0b358c"
+            ]
+        ]
+    }
+]

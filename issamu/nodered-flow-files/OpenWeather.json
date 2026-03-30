@@ -1,0 +1,243 @@
+[
+    {
+        "id": "5a01aa6d3cdcef31",
+        "type": "tab",
+        "label": "OpenWeather",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "289285d0792d7de5",
+        "type": "http request",
+        "z": "5a01aa6d3cdcef31",
+        "name": "get data from openweather",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "query",
+        "url": "https://api.openweathermap.org/data/2.5/weather",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 180,
+        "y": 160,
+        "wires": [
+            [
+                "460304a0633a48a4"
+            ]
+        ]
+    },
+    {
+        "id": "22e748d2238e617b",
+        "type": "template",
+        "z": "5a01aa6d3cdcef31",
+        "name": "query params for openweather",
+        "field": "payload",
+        "fieldType": "msg",
+        "format": "handlebars",
+        "syntax": "mustache",
+        "template": "{\n    \"lat\": {{lat}},\n    \"lon\": {{lon}},\n    \"appid\": \"{{appid}}\"\n}",
+        "output": "json",
+        "x": 190,
+        "y": 120,
+        "wires": [
+            [
+                "289285d0792d7de5"
+            ]
+        ]
+    },
+    {
+        "id": "5b2d5fb9475a2744",
+        "type": "inject",
+        "z": "5a01aa6d3cdcef31",
+        "name": "",
+        "props": [
+            {
+                "p": "eds",
+                "v": "https://localhost/piwebapi",
+                "vt": "str"
+            },
+            {
+                "p": "type_id",
+                "v": "openweather-type",
+                "vt": "str"
+            },
+            {
+                "p": "stream_id",
+                "v": "openweather_FITUI_PowerSubstation",
+                "vt": "str"
+            },
+            {
+                "p": "lat",
+                "v": "14.11024369383964",
+                "vt": "str"
+            },
+            {
+                "p": "lon",
+                "v": "121.13706737889463",
+                "vt": "str"
+            },
+            {
+                "p": "appid",
+                "v": "1348130dbc59af27f66be9edef0ce7df",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "*/15 0-23 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "22e748d2238e617b"
+            ]
+        ]
+    },
+    {
+        "id": "460304a0633a48a4",
+        "type": "function",
+        "z": "5a01aa6d3cdcef31",
+        "name": "OMF Sequence",
+        "func": "msg.omfSequence = {\n\n    type: [\n        {\n            \"id\": msg.type_id,\n            \"type\": \"object\",\n            \"classification\": \"dynamic\",\n            \"properties\": {\n                \"timestamp\": { \"type\": \"string\", \"format\": \"date-time\", \"isindex\": true },\n                \"temp\": { \"type\": \"number\", \"format\": \"float32\" },\n                \"feels_like\": { \"type\": \"number\", \"format\": \"float32\" },\n                \"temp_min\": { \"type\": \"number\", \"format\": \"float32\" },\n                \"temp_max\": { \"type\": \"number\", \"format\": \"float32\" },\n                \"pressure\": { \"type\": \"number\", \"format\": \"float32\" },\n                \"humidity\": { \"type\": \"number\", \"format\": \"float32\" }\n            }\n        }\n    ],\n\n    container: [\n        {\n            \"id\": msg.stream_id,\n            \"typeid\": msg.type_id\n        }\n    ],\n\n    data: [\n        {\n            \"containerid\": msg.stream_id,\n            \"values\": [\n                {\n                    \"timestamp\": new Date().toISOString(),\n                    \"temp\": msg.payload.main.temp -= 275.13,\n                    \"feels_like\": msg.payload.main.feels_like -= 275.13,\n                    \"temp_min\": msg.payload.main.temp_min -= 275.13,\n                    \"temp_max\": msg.payload.main.temp_max -= 275.13,\n                    \"pressure\": msg.payload.main.pressure,\n                    \"humidity\": msg.payload.main.humidity\n                }\n            ]\n        }\n    ]\n}\n\nreturn msg",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 160,
+        "wires": [
+            [
+                "a52637c31332050d",
+                "48c6c952961636c0"
+            ]
+        ]
+    },
+    {
+        "id": "f942dd8da98b095a",
+        "type": "debug",
+        "z": "5a01aa6d3cdcef31",
+        "name": "OMF Sequence Results",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "a52637c31332050d",
+        "type": "debug",
+        "z": "5a01aa6d3cdcef31",
+        "name": "OMF Sequence",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 500,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "8008cb66157d5e27",
+        "type": "piwebapi-omf-writer",
+        "z": "5a01aa6d3cdcef31",
+        "name": "",
+        "server": "6199fb8fb2a82a17",
+        "compression": "none",
+        "typeContextKey": "omf_types",
+        "containerContextKey": "omf_containers",
+        "batchSize": 10,
+        "flushInterval": 1000,
+        "maxRetries": 3,
+        "retryDelay": 1000,
+        "containeridType": "msg",
+        "containerid": "topic",
+        "timestampType": "msg",
+        "timestamp": "timestamp",
+        "valueType": "msg",
+        "value": "payload",
+        "qualityType": "msg",
+        "quality": "quality",
+        "x": 390,
+        "y": 320,
+        "wires": [
+            [
+                "f942dd8da98b095a"
+            ]
+        ]
+    },
+    {
+        "id": "48c6c952961636c0",
+        "type": "function",
+        "z": "5a01aa6d3cdcef31",
+        "name": "Setup OMF Write",
+        "func": "let msgOMFWrite = {\n    topic: msg.omfSequence.data[0].containerid,\n    timestamp: msg.omfSequence.data[0].values[0].timestamp,\n    payload: msg.omfSequence.data[0].values[0],\n    quality: 0\n}\n\nreturn msgOMFWrite;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 280,
+        "wires": [
+            [
+                "94edf8e5135a7186"
+            ]
+        ]
+    },
+    {
+        "id": "94edf8e5135a7186",
+        "type": "change",
+        "z": "5a01aa6d3cdcef31",
+        "name": "Delete Extra Parameters",
+        "rules": [
+            {
+                "t": "delete",
+                "p": "payload.timestamp",
+                "pt": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 170,
+        "y": 320,
+        "wires": [
+            [
+                "8008cb66157d5e27"
+            ]
+        ]
+    },
+    {
+        "id": "6199fb8fb2a82a17",
+        "type": "piwebapi-config",
+        "name": "PI-SVR.local",
+        "baseUrl": "https://10.10.20.7/piwebapi",
+        "authMethod": "basic",
+        "verifySsl": false,
+        "afServer": "",
+        "piServer": "",
+        "afDatabase": ""
+    }
+]

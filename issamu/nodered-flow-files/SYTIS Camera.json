@@ -1,0 +1,1209 @@
+[
+    {
+        "id": "3f9cb715b857e370",
+        "type": "subflow",
+        "name": "IIS Thermal Camera",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 140,
+                "y": 520,
+                "wires": [
+                    {
+                        "id": "e473fdf4da0f5172"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1580,
+                "y": 460,
+                "wires": [
+                    {
+                        "id": "855ad88a446a6da8",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
+        "id": "c980a403c3aac47a",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Deltas",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Delta_Temp_1\", \"Delta_Temp_2\", \"Delta_Temp_3\", \"Delta_Temp_4\", \"Delta_Temp_5\", \"Delta_Temp_6\", \"Preset\"]\nvar msgInfo = [\"Delta\", \"Delta\", \"Delta\", \"Delta\", \"Delta\", \"Delta\", \"Preset\"]\nvar msgScale = [1, 273.15]\n\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        case \"Preset\":\n            value = buf.readUInt16BE(i)\n            i += 4\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Preset\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 140,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "e473fdf4da0f5172",
+        "type": "switch",
+        "z": "3f9cb715b857e370",
+        "name": "Split sequenced polled data",
+        "property": "modbusRequest.name",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "Temperature Deltas",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 00",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 01",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 02",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 03",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 04",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 05",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 06",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 07",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 08",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 09",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 10",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 11",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 12",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 13",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 14",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 15",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 16",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 17",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 18",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "Temperature Measurements 19",
+                "vt": "str"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 21,
+        "x": 420,
+        "y": 520,
+        "wires": [
+            [
+                "c980a403c3aac47a"
+            ],
+            [
+                "ccb2572235625587"
+            ],
+            [
+                "82dfd665a5358c87"
+            ],
+            [
+                "344b0b55b080160d"
+            ],
+            [
+                "d1302fc833fe6264"
+            ],
+            [
+                "17c0c786a13231cb"
+            ],
+            [
+                "1cfa1dc0e6d4cc27"
+            ],
+            [
+                "a8135ecc0c28dc26"
+            ],
+            [
+                "69656bb8489a1fa8"
+            ],
+            [
+                "bd8b5d82bedaf107"
+            ],
+            [
+                "9796b377614f8291"
+            ],
+            [
+                "f58460d71e8d9bb9"
+            ],
+            [
+                "7ac256467b2876a1"
+            ],
+            [
+                "5f3654e980cd6a9e"
+            ],
+            [
+                "5e77358921eaf9b4"
+            ],
+            [
+                "441241477805cc0a"
+            ],
+            [
+                "545a9fc96d2297c7"
+            ],
+            [
+                "45dbbb62f3f1bd06"
+            ],
+            [
+                "547fc71d4b1b6016"
+            ],
+            [
+                "67961f18d1082a0c"
+            ],
+            [
+                "1bf647fc1327b4de"
+            ]
+        ]
+    },
+    {
+        "id": "2bd1b8d6da2e1bbf",
+        "type": "change",
+        "z": "3f9cb715b857e370",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "complete",
+                "pt": "msg",
+                "to": "True",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1230,
+        "y": 720,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "855ad88a446a6da8",
+        "type": "join",
+        "z": "3f9cb715b857e370",
+        "name": "",
+        "mode": "custom",
+        "build": "merged",
+        "property": "payload.data",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 1450,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ccb2572235625587",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 00",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 180,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "82dfd665a5358c87",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 01",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 220,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "344b0b55b080160d",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 02",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 260,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "d1302fc833fe6264",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 03",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 300,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "17c0c786a13231cb",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 04",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 340,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "1cfa1dc0e6d4cc27",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 05",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 380,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "a8135ecc0c28dc26",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 06",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 420,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "69656bb8489a1fa8",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 07",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 460,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "bd8b5d82bedaf107",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 08",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 500,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "9796b377614f8291",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 09",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 540,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "f58460d71e8d9bb9",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 10",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 580,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "7ac256467b2876a1",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 11",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 620,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "5f3654e980cd6a9e",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 12",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 660,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "5e77358921eaf9b4",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 13",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 700,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "441241477805cc0a",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 14",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 740,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "545a9fc96d2297c7",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 15",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 780,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "45dbbb62f3f1bd06",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 16",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 820,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "547fc71d4b1b6016",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 17",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 860,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "67961f18d1082a0c",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 18",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 900,
+        "wires": [
+            [
+                "855ad88a446a6da8"
+            ]
+        ]
+    },
+    {
+        "id": "1bf647fc1327b4de",
+        "type": "function",
+        "z": "3f9cb715b857e370",
+        "name": "Temperature Measurements 19",
+        "func": "// Round numbers to 2 decimal\nfunction round(num) {\n    return Math.round((num + Number.EPSILON) * 100) / 100\n}\n\nvar index = msg.modbusRequest.name.slice(-2)\n\n// List of parameter names, scientific notation, and scale\nvar msgList = [\"Spot_\" + index + \"_Temp\", \"Area_\" + index + \"_Min_Temp\", \"Area_\" + index + \"_Max_Temp\", \"Area_\" + index + \"_Avg_Temp\", \"Spot_\" + index + \"_State\", \"Area_\" + index + \"_Min_State\", \"Area_\" + index + \"_Max_State\", \"Area_\" + index +\"_Avg_State\"]\nvar msgInfo = [\"Temp\", \"Temp\", \"Temp\", \"Temp\", \"State\", \"State\", \"State\", \"State\"]\nvar msgScale = [1, 273.15]\n\n// Create new Buffer based on array bytes\nconst buf = Buffer.from(msg.payload.buffer);\nconst numBytes = buf.length\n\nconst arrTemp = []\nvar i = 0, j = 0, value\nmsg.payload.data = {}\n\n// Represent these bytes as Float\nwhile (i <= numBytes - 2) {\n    switch (msgInfo[j]) {\n        case \"State\":\n            value = buf.readUInt16BE(i)\n            i += 2\n            break;\n        default:\n            value = buf.readFloatBE(i)\n            i += 4\n            break;\n    }\n    arrTemp.push(value)\n    j++\n}\n\nfor (i = 0; i < arrTemp.length; i++) {\n    switch (msgInfo[i]) {\n        case \"Delta\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"Temp\":\n            msg.payload.data[msgList[i]] = round(arrTemp[i])\n            break;\n        case \"State\":\n            msg.payload.data[msgList[i]] = arrTemp[i]\n            break;\n        default:\n            break;\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 830,
+        "y": 940,
+        "wires": [
+            [
+                "2bd1b8d6da2e1bbf"
+            ]
+        ]
+    },
+    {
+        "id": "9c6c24882da694f6",
+        "type": "tab",
+        "label": "SYTIS Camera",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "67e2a23f6ae71d4d",
+        "type": "inject",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "props": [
+            {
+                "p": "connection",
+                "v": "{\"connectorType\":\"TCP\",\"tcpHost\":\"172.16.1.12\",\"tcpPort\":\"502\",\"unitID\":1}",
+                "vt": "json"
+            },
+            {
+                "p": "payload"
+            },
+            {
+                "p": "timestamp",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "httpRequest",
+                "v": "{\"server\":\"helios-api\",\"port\":\"15434\"}",
+                "vt": "json"
+            }
+        ],
+        "repeat": "",
+        "crontab": "*/1 0-23 * * *",
+        "once": false,
+        "onceDelay": "0.2",
+        "topic": "",
+        "payload": "{}",
+        "payloadType": "json",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "5f7e1a9ba421cbe0",
+                "e16b44e1ffd290ce"
+            ]
+        ]
+    },
+    {
+        "id": "73ae0fcc69f64e1f",
+        "type": "debug",
+        "z": "9c6c24882da694f6",
+        "name": "Final Check",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2030,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "159cd72775510519",
+        "type": "subflow:3f9cb715b857e370",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "x": 580,
+        "y": 280,
+        "wires": [
+            [
+                "141c7ac178218574"
+            ]
+        ]
+    },
+    {
+        "id": "ec87f91def09b463",
+        "type": "modbus-flex-sequencer",
+        "z": "9c6c24882da694f6",
+        "name": "Dummy Request for Override",
+        "sequences": [
+            {
+                "name": "Dummy",
+                "unitid": "1",
+                "fc": "FC3",
+                "address": "0",
+                "quantity": "0"
+            }
+        ],
+        "server": "327362bc789a6557",
+        "showStatusActivities": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "logIOActivities": false,
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "2",
+        "x": 320,
+        "y": 320,
+        "wires": [
+            [],
+            [
+                "159cd72775510519"
+            ]
+        ]
+    },
+    {
+        "id": "e16b44e1ffd290ce",
+        "type": "function",
+        "z": "9c6c24882da694f6",
+        "name": "Modbus Override Request",
+        "func": "msg.sequences = [\n\n    { name: \"Temperature Deltas\", fc: 3, address: 2004, unitid: 1, quantity: 14 },\n    { name: \"Temperature Measurements 00\", fc: 3, address: 2018, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 01\", fc: 3, address: 2030, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 02\", fc: 3, address: 2042, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 03\", fc: 3, address: 2054, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 04\", fc: 3, address: 2066, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 05\", fc: 3, address: 2078, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 06\", fc: 3, address: 2090, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 07\", fc: 3, address: 2102, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 08\", fc: 3, address: 2114, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 09\", fc: 3, address: 2126, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 10\", fc: 3, address: 2138, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 11\", fc: 3, address: 2150, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 12\", fc: 3, address: 2162, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 13\", fc: 3, address: 2174, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 14\", fc: 3, address: 2186, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 15\", fc: 3, address: 2198, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 16\", fc: 3, address: 2210, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 17\", fc: 3, address: 2222, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 18\", fc: 3, address: 2234, unitid: 1, quantity: 12 },\n    { name: \"Temperature Measurements 19\", fc: 3, address: 2246, unitid: 1, quantity: 12 }\n\n] \n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 280,
+        "wires": [
+            [
+                "ec87f91def09b463"
+            ]
+        ]
+    },
+    {
+        "id": "5f7e1a9ba421cbe0",
+        "type": "join",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "mode": "custom",
+        "build": "merged",
+        "property": "connection",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": true,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "8254112bf13b634e"
+            ]
+        ]
+    },
+    {
+        "id": "141c7ac178218574",
+        "type": "change",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "complete",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            },
+            {
+                "t": "set",
+                "p": "connection",
+                "pt": "msg",
+                "to": "{}",
+                "tot": "json"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 600,
+        "y": 320,
+        "wires": [
+            [
+                "5f7e1a9ba421cbe0"
+            ]
+        ]
+    },
+    {
+        "id": "8254112bf13b634e",
+        "type": "function",
+        "z": "9c6c24882da694f6",
+        "name": "RM Key Value Pair Where State Is 0 With Its Temp Counterpart",
+        "func": "let data = msg.payload.data;\n\n// Clone the object to avoid mutating while iterating\nlet updatedData = { ...data };\n\nObject.keys(data).forEach(key => {\n    // Process only if it's a *_State and value is 0\n    if (key.endsWith(\"_State\") && data[key] === 0) {\n        // Derive the corresponding Temp key\n        let tempKey = key.replace(\"_State\", \"_Temp\");\n\n        // Delete both State and Temp if they exist\n        if (updatedData.hasOwnProperty(key)) {\n            delete updatedData[key];\n        }\n        if (updatedData.hasOwnProperty(tempKey)) {\n            delete updatedData[tempKey];\n        }\n    }\n});\n\n// Set modified data\nmsg.payload.data = updatedData;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 990,
+        "y": 300,
+        "wires": [
+            [
+                "379e0391ab922b4a",
+                "2e28ef881e6d7670"
+            ]
+        ]
+    },
+    {
+        "id": "e06f8102f65740a5",
+        "type": "http request",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "method": "GET",
+        "ret": "txt",
+        "paytoqs": "ignore",
+        "url": "{{{server}}}:{{{port}}}/{{{endpoint}}}",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1030,
+        "y": 380,
+        "wires": [
+            [
+                "7030b660e74ae539"
+            ]
+        ]
+    },
+    {
+        "id": "7030b660e74ae539",
+        "type": "json",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 1190,
+        "y": 380,
+        "wires": [
+            [
+                "9805c78a94e60764"
+            ]
+        ]
+    },
+    {
+        "id": "379e0391ab922b4a",
+        "type": "function",
+        "z": "9c6c24882da694f6",
+        "name": "Set URL",
+        "func": "msg.httpRequest.endpoint = \"api/data?camera_ip=\" + msg.connection.tcpHost + \"&preset_number=\" + msg.payload.data.Preset.toString()\n\nreturn msg.httpRequest;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 860,
+        "y": 380,
+        "wires": [
+            [
+                "e06f8102f65740a5"
+            ]
+        ]
+    },
+    {
+        "id": "9805c78a94e60764",
+        "type": "change",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "complete",
+                "pt": "msg",
+                "to": "true",
+                "tot": "bool"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1370,
+        "y": 380,
+        "wires": [
+            [
+                "38c4e51957d12385"
+            ]
+        ]
+    },
+    {
+        "id": "38c4e51957d12385",
+        "type": "join",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "mode": "custom",
+        "build": "merged",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": "\\n",
+        "joinerType": "str",
+        "useparts": false,
+        "accumulate": true,
+        "timeout": "",
+        "count": "",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 1590,
+        "y": 300,
+        "wires": [
+            [
+                "3e1359417a921d68"
+            ]
+        ]
+    },
+    {
+        "id": "2e28ef881e6d7670",
+        "type": "moment",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "topic": "",
+        "input": "timestamp",
+        "inputType": "msg",
+        "inTz": "ETC/UTC",
+        "adjAmount": "1500",
+        "adjType": "milliseconds",
+        "adjDir": "add",
+        "format": "",
+        "locale": "POSIX",
+        "output": "ISO8601",
+        "outputType": "msg",
+        "outTz": "ETC/UTC",
+        "x": 1380,
+        "y": 300,
+        "wires": [
+            [
+                "38c4e51957d12385"
+            ]
+        ]
+    },
+    {
+        "id": "a07b373b2c67dc14",
+        "type": "postgresql",
+        "z": "9c6c24882da694f6",
+        "name": "",
+        "query": "{{{msg.query}}}",
+        "postgreSQLConfig": "c3af49600eb2efe7",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1610,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3e1359417a921d68",
+        "type": "switch",
+        "z": "9c6c24882da694f6",
+        "name": "Check for return data of Masterlist",
+        "property": "payload.sheets",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "empty"
+            },
+            {
+                "t": "nempty"
+            }
+        ],
+        "checkall": "false",
+        "repair": false,
+        "outputs": 2,
+        "x": 1820,
+        "y": 300,
+        "wires": [
+            [
+                "c0aa248fcc4bf4dc"
+            ],
+            [
+                "382f3b0aae3dbe4d"
+            ]
+        ]
+    },
+    {
+        "id": "c0aa248fcc4bf4dc",
+        "type": "debug",
+        "z": "9c6c24882da694f6",
+        "name": "Non existing preset from masterlist",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1820,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "382f3b0aae3dbe4d",
+        "type": "function",
+        "z": "9c6c24882da694f6",
+        "name": "PostgreSQL table insert values",
+        "func": "let input = msg.payload.sheets[0]; // Input JSON\nlet headers = input.headers;\nlet metadata = input.data;\n\n// Parse metadata into array of objects\nlet table = metadata.map(row => {\n    let obj = {};\n    headers.forEach((key, i) => {\n        obj[key] = row[i];\n    });\n    return obj;\n});\n\nlet data = msg.payload.data;\n\n// Group rows by point_in_preset\nlet groupedByPoint = {};\ntable.forEach(entry => {\n    let point = entry.point_in_preset;\n    if (!groupedByPoint[point]) {\n        groupedByPoint[point] = {\n            Point: null,\n            AreaMin: null,\n            AreaMax: null,\n            AreaAvg: null\n        };\n    }\n\n    if (entry.measurement_type === \"Point\") groupedByPoint[point].Point = entry;\n    if (entry.measurement_type === \"AreaMin\") groupedByPoint[point].AreaMin = entry;\n    if (entry.measurement_type === \"AreaMax\") groupedByPoint[point].AreaMax = entry;\n    if (entry.measurement_type === \"AreaAvg\") groupedByPoint[point].AreaAvg = entry;\n});\n\nlet result = [];\n\nfor (let point in groupedByPoint) {\n    let group = groupedByPoint[point];\n    let pointNum = parseInt(point); // or: let pointNum = +point;\n    let pointStr = pointNum < 10 ? `0${point}` : `${point}`;\n\n    // Spot\n    let spotTempKey = `Spot_${pointStr}_Temp`;\n    let spotStateKey = `Spot_${pointStr}_State`;\n    if (group.Point && data.hasOwnProperty(spotTempKey)) {\n        let cam = { ...group.Point };\n        cam.type = \"Spot\";\n        cam.temperature = data[spotTempKey];\n        cam.state = data[spotStateKey] ?? null;\n        cam.temp_key = spotTempKey;\n        result.push(cam);\n    }\n\n    // Area Min\n    let areaMinTempKey = `Area_${pointStr}_Min_Temp`;\n    let areaMinStateKey = `Area_${pointStr}_Min_State`;\n    if (group.AreaMin && data.hasOwnProperty(areaMinTempKey)) {\n        let cam = { ...group.AreaMin };\n        cam.type = \"AreaMin\";\n        cam.temperature = data[areaMinTempKey];\n        cam.state = data[areaMinStateKey] ?? null;\n        cam.temp_key = areaMinTempKey;\n        result.push(cam);\n    }\n\n    // Area Max\n    let areaMaxTempKey = `Area_${pointStr}_Max_Temp`;\n    let areaMaxStateKey = `Area_${pointStr}_Max_State`;\n    if (group.AreaMax && data.hasOwnProperty(areaMaxTempKey)) {\n        let cam = { ...group.AreaMax };\n        cam.type = \"AreaMax\";\n        cam.temperature = data[areaMaxTempKey];\n        cam.state = data[areaMaxStateKey] ?? null;\n        cam.temp_key = areaMaxTempKey;\n        result.push(cam);\n    }\n\n    // Area Avg\n    let areaAvgTempKey = `Area_${pointStr}_Avg_Temp`;\n    let areaAvgStateKey = `Area_${pointStr}_Avg_State`;\n    if (group.AreaAvg && data.hasOwnProperty(areaAvgTempKey)) {\n        let cam = { ...group.AreaAvg };\n        cam.type = \"AreaAvg\";\n        cam.temperature = data[areaAvgTempKey];\n        cam.state = data[areaAvgStateKey] ?? null;\n        cam.temp_key = areaAvgTempKey;\n        result.push(cam);\n    }\n}\n\nmsg.payload.table = result;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1670,
+        "y": 400,
+        "wires": [
+            [
+                "697486e8e8779f94"
+            ]
+        ]
+    },
+    {
+        "id": "697486e8e8779f94",
+        "type": "function",
+        "z": "9c6c24882da694f6",
+        "name": "PostgreSQL build insert statement with params",
+        "func": "const timestamp = msg.ISO8601;\n\nmsg.params = [];\n\nmsg.payload.table.forEach(row => {\n    switch(row.type){\n    // Push values individually to flatten\n        case \"Spot\":\n            msg.params.push(timestamp, row.measurement, row.temperature);\n            break;\n        case \"AreaMin\":\n            msg.params.push(timestamp, `${row.measurement}_Min`, row.temperature);\n            break;\n        case \"AreaMax\":\n            msg.params.push(timestamp, `${row.measurement}_Max`, row.temperature);\n            break;\n        case \"AreaAvg\":\n            msg.params.push(timestamp, `${row.measurement}_Avg`, row.temperature);\n            break;\n        default:\n            break;\n    } \n});\n\nconst values = [];\n\n// Dynamically build query parts\n// Depends on PostgreSQL table schema. \n// Current count is: 3 (time, measurement, value)\nconst count = 3\nconst totalRows = msg.params.length / count;\nfor (let i = 0; i < totalRows; i++) {\n    const idx = i * count;\n    // update push parameters depending on the count\n    values.push(`($${idx + 1}, $${idx + 2}, $${idx + 3})`);\n}\n\n// Build final query string\n// check database name\n// Current name is: data_archive\nconst db_name = \"data_archive\"\nmsg.query = `\n    INSERT INTO ${db_name} (time, measurement, value)\n    VALUES ${values.join(', ')}\n`;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1720,
+        "y": 440,
+        "wires": [
+            [
+                "73ae0fcc69f64e1f",
+                "a07b373b2c67dc14"
+            ]
+        ]
+    },
+    {
+        "id": "327362bc789a6557",
+        "type": "modbus-client",
+        "name": "SYTIS",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "172.16.1.12",
+        "tcpPort": 502,
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": 9600,
+        "serialDatabits": 8,
+        "serialStopbits": 1,
+        "serialParity": "none",
+        "serialConnectionDelay": 100,
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": "5",
+        "clientTimeout": 500,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 1000,
+        "parallelUnitIdsAllowed": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "showLogs": true
+    },
+    {
+        "id": "c3af49600eb2efe7",
+        "type": "postgreSQLConfig",
+        "name": "",
+        "host": "helios-timescale",
+        "hostFieldType": "str",
+        "port": "5432",
+        "portFieldType": "num",
+        "database": "timescale",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "user": "postgres",
+        "userFieldType": "str",
+        "password": "postgres",
+        "passwordFieldType": "str"
+    }
+]
